@@ -132,7 +132,6 @@ A implementação usando UDP se mostrou interessante devido ao fato de que não 
 
 # Bibliografia
 
-- [_GitHub Repository_](https://github.com/axell-brendow/networks-i/tree/main/works/udp-prices-system)
 - [_Node.js TCP client and server example_](https://gist.github.com/tedmiston/5935757)
 - [_Simple UDP Client and Server in Node.js_](https://gist.github.com/sid24rane/6e6698e93360f2694e310dd347a2e2eb)
 - [_Observer Pattern_](https://pt.wikipedia.org/wiki/Observer)
