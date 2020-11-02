@@ -76,7 +76,7 @@ Há duas decisões importantes, ambas relacionadas às mensagens transferidas en
   type Message = {
     id: string; // Id da mensagem.
     // Tipo da mensagem, sendo que "D" e "P" se referem
-    // a inserção e busca de um preço.
+    // a inserção e busca de um preço respectivamente.
     type: "D" | "P";
     data: any; // Dados da mensagem. Equivalente ao body no HTTP por exemplo.
   };
