@@ -31,7 +31,7 @@ server.on("message", (msg, info) => {
 
   const message = JSON.parse(msg.toString());
 
-  console.log("Message received:", message);
+  console.log(`Message received (${new Date().toLocaleString()}):`, message);
 
   observers.runObservers(message, info);
 });

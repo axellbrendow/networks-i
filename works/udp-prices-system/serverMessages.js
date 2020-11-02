@@ -51,7 +51,10 @@ class Messages {
             if (error) {
               console.error(error);
             } else {
-              console.log("Message sent (response):", message);
+              console.log(
+                `Message sent (response)(${new Date().toLocaleString()}):`,
+                message
+              );
             }
           }
         );
