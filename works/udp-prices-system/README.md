@@ -128,7 +128,7 @@ Esta é a resposta para a busca:
 
 # Conclusão
 
-A implementação usando UDP se mostrou interessante devido ao fato de que não é necessária estabelecer uma conexão antes de mandar os dados, você informa o destino toda vez que vai mandar um dado, achei interessante. Outro ponto muito bacana foi sem dúvida encontrar um projeto onde o padrão _Observer_ se encaixa perfeitamente.
+A implementação usando UDP se mostrou interessante devido ao fato de que não é necessário estabelecer uma conexão antes de mandar os dados, você só informa o destino quando vai mandar o dado. Outro ponto muito bacana foi sem dúvida encontrar um projeto onde o padrão de projeto de software _Observer_ se encaixa perfeitamente. Além disso, ao fazer esse projeto percebi o porquê de existirem alguns padrões no protocolo HTTP como os métodos GET, POST, DELETE e outros.
 
 # Bibliografia
 
