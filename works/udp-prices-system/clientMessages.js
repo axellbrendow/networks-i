@@ -9,7 +9,7 @@ class Messages {
    */
   constructor(client, observers) {
     this.client = client;
-    /** @type {{ [id: string]: import("./serverMessages").Message }} */
+    /** @type {{ [id: string]: import("./Observers").Message }} */
     this.messages = {};
     this.observers = observers;
     this.addObservers();

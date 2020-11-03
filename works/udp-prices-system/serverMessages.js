@@ -9,7 +9,7 @@ class Messages {
    */
   constructor(server, observers, repository) {
     this.server = server;
-    /** @type {{ [id: string]: import("./serverMessages").Message }} */
+    /** @type {{ [id: string]: import("./Observers").Message }} */
     this.messages = {};
     this.repository = repository;
     this.observers = observers;
