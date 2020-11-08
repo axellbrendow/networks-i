@@ -50,7 +50,7 @@ class Messages {
    * @param {number} price.latitude
    * @param {number} price.longitude
    */
-  addPrice(price, numTries = 0) {
+  addPrice(price, numTries = 3) {
     const message = this.createNewMessage(price, MessageType.ADD_PRICE);
 
     const data = Buffer.from(JSON.stringify(message));
@@ -58,10 +58,10 @@ class Messages {
     this.client.send(data, serverPort, serverHost, error => {
       if (error) {
         console.error(error);
-        if (numTries < 3) addPrice(price, numTries + 1);
+        if (numTries > 0) this.addPrice(price, numTries - 1);
         else console.error("Nao foi possivel enviar os dados (3 tentativas)");
       } else {
-        //   console.log(`Data sent: ${JSON.stringify(message, null, 2)}`);
+        // console.log(`Data sent: ${JSON.stringify(message, null, 2)}`);
       }
     });
   }
@@ -73,7 +73,7 @@ class Messages {
    * @param {number} searchParams.latitude
    * @param {number} searchParams.longitude
    */
-  getLowestPrice(searchParams, numTries = 0) {
+  getLowestPrice(searchParams, numTries = 3) {
     const message = this.createNewMessage(
       searchParams,
       MessageType.SEARCH_PRICE
@@ -84,10 +84,10 @@ class Messages {
     this.client.send(data, serverPort, serverHost, error => {
       if (error) {
         console.error(error);
-        if (numTries < 3) getLowestPrice(searchParams, numTries + 1);
+        if (numTries > 0) this.getLowestPrice(searchParams, numTries - 1);
         else console.error("Nao foi possivel enviar os dados (3 tentativas)");
       } else {
-        //   console.log("Data sent !!!");
+        // console.log("Data sent !!!");
       }
     });
   }
