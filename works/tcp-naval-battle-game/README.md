@@ -1,6 +1,6 @@
 # Aplicação Cliente-Servidor - Batalha Naval - Protocolo TCP
 
-Um detalhe interessante desse projeto relacionado à programação é que mesmo sendo feito em JavaScript, o projeto está 100% tipado por meio de JSDocs. Até mesmo os dados enviados nas requisições e nas respostas estão com suas tipagens.
+Um detalhe interessante desse projeto e que é relacionado à programação é que mesmo sendo feito em JavaScript, o projeto está 100% tipado por meio de JSDocs. Até mesmo os dados enviados nas requisições e nas respostas entre o cliente e o servidor estão com suas tipagens.
 
 ## Requisitos para execução
 
