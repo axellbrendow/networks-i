@@ -1,5 +1,5 @@
 const Board = require("./Board");
-const { getRandomInt } = require("./math");
+const { getRandomInt } = require("../utils/math");
 
 class Shot {
   /**

@@ -1,5 +1,5 @@
 const Ship = require("./Ship");
-const { getRandomInt } = require("./math");
+const { getRandomInt } = require("../utils/math");
 
 class Board {
   static BOARD_SIZE = 10;
