@@ -1,11 +1,13 @@
 const { getData, setData, createUniqueIdFor } = require("./global");
 
+const { Board } = require("../../shared");
+
 /**
  * @param {import('../../shared/Board')} board
  * @param {string} matchId
  * @param {string} playerId
  */
-module.exports.set = (board, matchId, playerId) => {
+const set = (board, matchId, playerId) => {
   const data = getData();
 
   const boardId = createUniqueIdFor("boards", data);
@@ -20,6 +22,16 @@ module.exports.set = (board, matchId, playerId) => {
   setData(data);
 
   return board;
+};
+
+module.exports.set = set;
+
+/**
+ * @param {string} matchId
+ * @param {string} playerId
+ */
+module.exports.random = (matchId, playerId) => {
+  return set(Board.random(), matchId, playerId);
 };
 
 /**
