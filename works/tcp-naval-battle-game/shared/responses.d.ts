@@ -14,9 +14,21 @@ export interface Responses {
     gameOver: boolean;
   };
 
-  SERVER_SHOT: {
+  ENEMY_SHOT: {
     hit: boolean;
     gameOver: boolean;
     shot: Shot;
   };
+
+  JOIN_MATCH:
+    | {
+        success: false;
+        error: string;
+      }
+    | {
+        success: true;
+        match: Match;
+      };
+
+  PLAYER2_DEFINED_BOARD: Match;
 }

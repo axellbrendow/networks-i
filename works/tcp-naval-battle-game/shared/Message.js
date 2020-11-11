@@ -1,6 +1,14 @@
 /**
- * @typedef {"CREATE_MATCH" | "START_MATCH" | "SET_BOARD" | "SHOT" | "SERVER_SHOT"} MessageType
- */
+@typedef {
+  "CREATE_MATCH" |
+  "START_MATCH" |
+  "SET_BOARD" |
+  "SHOT" |
+  "ENEMY_SHOT" |
+  "JOIN_MATCH" |
+  "PLAYER2_DEFINED_BOARD"
+} MessageType
+*/
 
 /**
  * @template MessageData
@@ -12,7 +20,9 @@ class Message {
     START_MATCH: "START_MATCH",
     SET_BOARD: "SET_BOARD",
     SHOT: "SHOT",
-    SERVER_SHOT: "SERVER_SHOT",
+    ENEMY_SHOT: "ENEMY_SHOT",
+    JOIN_MATCH: "JOIN_MATCH",
+    PLAYER2_DEFINED_BOARD: "PLAYER2_DEFINED_BOARD",
   };
 
   /**

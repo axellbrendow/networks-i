@@ -2,7 +2,9 @@ import Board from "./Board";
 import Shot from "./Shot";
 
 export interface Requests {
-  CREATE_MATCH: null;
+  CREATE_MATCH: {
+    player2IsABot: boolean;
+  };
 
   START_MATCH: {
     matchId: string;
@@ -19,5 +21,11 @@ export interface Requests {
     shot: Shot;
   };
 
-  SERVER_SHOT: null; // Client cannot pass a message with this type
+  ENEMY_SHOT: null; // Client cannot pass a message with this type
+
+  JOIN_MATCH: {
+    matchId: string;
+  };
+
+  PLAYER2_DEFINED_BOARD: null; // Client cannot pass a message with this type
 }
