@@ -1,33 +1,29 @@
 const { getData, createUniqueIdFor, setData } = require("./global");
 
-const { Match, Board, Player } = require("../../shared");
+const { Match, Player } = require("../../shared");
 
-module.exports.create = () => {
+/**
+ * @param {Player} player1
+ * @param {string} player1SocketName
+ * @param {boolean} player2IsABot
+ */
+module.exports.create = (player1, player1SocketName, player2IsABot) => {
   const data = getData();
 
-  const player1 = new Player(createUniqueIdFor("players", data));
-  const player2 = new Player(Player.SERVER_PLAYER_ID);
-
   const matchId = createUniqueIdFor("matches", data);
-
-  const player2Board = Board.random();
-  const player2BoardId = createUniqueIdFor("boards", data);
-  player2Board.id = player2BoardId;
-  player2Board.matchId = matchId;
-  player2Board.playerId = player2.id;
 
   const match = new Match(
     matchId,
     player1,
-    player2,
     null,
-    player2Board,
+    player1SocketName,
+    null,
+    null,
+    null,
+    player2IsABot,
     Match.Status.CREATED
   );
 
-  data.players[player1.id] = player1;
-  data.players[player2.id] = player2;
-  data.boards[player2Board.id] = player2Board;
   data.matches[match.id] = match;
 
   setData(data);
@@ -61,4 +57,33 @@ module.exports.get = matchId => {
   const data = getData();
 
   return data.matches[matchId];
+};
+
+/**
+ * @param {import('../../shared/Match')} match
+ */
+module.exports.save = match => {
+  const data = getData();
+
+  data.matches[match.id] = match;
+
+  setData(data);
+};
+
+/**
+ * @param {import('../../shared/Board')} board
+ * @param {string} matchId
+ * @param {string} playerId
+ */
+module.exports.setBoard = (board, matchId, playerId) => {
+  const data = getData();
+
+  const match = data.matches[matchId];
+
+  match.boardsByPlayerId[playerId] = board;
+
+  if (playerId === match.player1.id) match.player1Board = board;
+  else match.player2Board = board;
+
+  setData(data);
 };
