@@ -4,7 +4,7 @@ const { getData, setData } = require("./global");
  * @param {string} matchId
  * @param {import('../../shared/Shot')} shot
  */
-module.exports.shot = (matchId, shot) => {
+module.exports.shoot = (matchId, shot) => {
   const data = getData();
 
   const board = data.boards[shot.boardId];

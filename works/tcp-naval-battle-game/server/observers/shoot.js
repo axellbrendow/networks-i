@@ -22,16 +22,14 @@ const hitShip = (shot, board) =>
  * @param {import('../../shared/Board')} board
  */
 const anyShipRemaining = board => {
-  for (const ship of board.ships) {
-    for (const point of ship.points) {
+  for (const ship of board.ships)
+    for (const point of ship.points)
       if (
         !board.shots.find(
           shot => shot.line === point.line && shot.column === point.column
         )
       )
         return true;
-    }
-  }
 
   return false;
 };
@@ -101,23 +99,22 @@ const getValidShotAfterHit = (lastShot, board) => {
 /**
  * @param {import('../Messages')} messages
  * @param {string} socketName
- * @param {string} matchId
+ * @param {Match} match
  * @param {string} serverEnemyId
  */
-const doServerShots = async (messages, socketName, matchId, serverEnemyId) => {
-  const match = repositories.match.get(matchId);
+const doServerShots = async (messages, socketName, match, serverEnemyId) => {
   const serverEnemyBoard = match.boardsByPlayerId[serverEnemyId];
 
   let serverShot = getValidShot(Player.SERVER_PLAYER_ID, serverEnemyBoard);
   let gameOver = !anyShipRemaining(serverEnemyBoard);
 
   while (!gameOver && hitShip(serverShot, serverEnemyBoard)) {
-    repositories.shot.shot(matchId, serverShot);
+    repositories.shot.shoot(match.id, serverShot);
     serverEnemyBoard.shots.push(serverShot);
 
     gameOver = !anyShipRemaining(serverEnemyBoard);
 
-    messages.sendMessage(null, socketName, Message.MsgType.SERVER_SHOT, {
+    messages.sendMessage(null, socketName, Message.MsgType.ENEMY_SHOT, {
       hit: true,
       gameOver,
       shot: serverShot,
@@ -126,9 +123,10 @@ const doServerShots = async (messages, socketName, matchId, serverEnemyId) => {
     serverShot = getValidShotAfterHit(serverShot, serverEnemyBoard);
   }
 
-  if (gameOver) repositories.match.updateStatus(matchId, Match.Status.FINISHED);
+  if (gameOver)
+    repositories.match.updateStatus(match.id, Match.Status.FINISHED);
   else
-    messages.sendMessage(null, socketName, Message.MsgType.SERVER_SHOT, {
+    messages.sendMessage(null, socketName, Message.MsgType.ENEMY_SHOT, {
       hit: false,
       gameOver: false,
       shot: serverShot,
@@ -146,7 +144,7 @@ module.exports = (message, messages, socketName) => {
     const board = repositories.board.get(shot.boardId);
     const hit = !!hitShip(shot, board);
 
-    repositories.shot.shot(message.data.matchId, shot);
+    repositories.shot.shoot(message.data.matchId, shot);
     board.shots.push(shot);
 
     const gameOver = !anyShipRemaining(board);
@@ -156,12 +154,27 @@ module.exports = (message, messages, socketName) => {
       gameOver,
     });
 
+    const match = repositories.match.get(message.data.matchId);
+
+    if (!match.player2IsABot) {
+      const enemySocketName =
+        shot.shooterId === match.player1.id
+          ? match.player2SocketName
+          : match.player1SocketName;
+
+      messages.sendMessage(null, enemySocketName, Message.MsgType.ENEMY_SHOT, {
+        hit,
+        gameOver,
+        shot,
+      });
+    }
+
     if (gameOver)
       repositories.match.updateStatus(
         message.data.matchId,
         Match.Status.FINISHED
       );
-    else if (!hit)
-      doServerShots(messages, socketName, message.data.matchId, shot.shooterId);
+    else if (match.player2IsABot && !hit)
+      doServerShots(messages, socketName, match, shot.shooterId);
   }
 };
