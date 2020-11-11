@@ -10,45 +10,53 @@ class ClientMatch {
   /**
    * @param {import('./Messages')} messages
    * @param {import('../shared/Match')} match
+   * @param {boolean} isPlayer1 indicates if this client is the player1
    */
-  constructor(messages, match) {
+  constructor(messages, match, isPlayer1) {
     this.messages = messages;
     this.match = match;
-    /** @type {Message<import('../shared/responses').Responses['SERVER_SHOT']>[]} */
-    this.serverShotMessages = [];
+    this.isPlayer1 = isPlayer1;
 
-    this.messages.addObserverFor(
-      Message.MsgType.SERVER_SHOT,
+    if (isPlayer1) {
+      this.player = match.player1;
+      this.playerBoard = match.player1Board;
+      this.enemyBoard = match.player2;
+      this.enemyBoard = match.player2Board;
+    } else {
+      this.player = match.player2;
+      this.playerBoard = match.player2Board;
+      this.enemyBoard = match.player1;
+      this.enemyBoard = match.player1Board;
+    }
+
+    /** @type {Message<import('../shared/responses').Responses['ENEMY_SHOT']>[]} */
+    this.enemyShotMessages = [];
+
+    this.enemyShotObserverId = this.messages.addObserverFor(
+      Message.MsgType.ENEMY_SHOT,
       (message, messages) => {
-        this.serverShotMessages.push(message);
+        this.enemyShotMessages.push(message);
       }
     );
 
-    this.start = this.start.bind(this);
-    this.shot = this.shot.bind(this);
     this.printBoards = this.printBoards.bind(this);
-    this.player1Turn = this.player1Turn.bind(this);
-    this.player2Turn = this.player2Turn.bind(this);
+    this.animateShot = this.animateShot.bind(this);
+    this.shot = this.shot.bind(this);
+    this.letPlayerShoot = this.letPlayerShoot.bind(this);
+    this.waitEnemyShots = this.waitEnemyShots.bind(this);
+    this.start = this.start.bind(this);
   }
 
-  async start() {
-    await this.messages.sendMessage(null, Message.MsgType.START_MATCH, {
-      matchId: this.match.id,
-    });
-
-    this.match.status = Match.Status.STARTED;
-
-    await this.player1Turn();
-
-    // @ts-ignore
-    while (this.match.status !== Match.Status.FINISHED) {
-      await this.player2Turn();
-
-      // @ts-ignore
-      if (this.match.status === Match.Status.FINISHED) break;
-
-      await this.player1Turn();
-    }
+  printBoards() {
+    console.clear();
+    console.log(
+      BoardVisualizer.printPlayerAndEnemy(
+        "You",
+        this.playerBoard,
+        "Enemy",
+        this.enemyBoard
+      )
+    );
   }
 
   /**
@@ -97,22 +105,10 @@ class ClientMatch {
     ).data;
   }
 
-  printBoards() {
-    console.clear();
-    console.log(
-      BoardVisualizer.printPlayerAndEnemy(
-        "You",
-        this.match.player1Board,
-        "Enemy",
-        this.match.player2Board
-      )
-    );
-  }
-
-  async player1Turn() {
+  async letPlayerShoot() {
     this.printBoards();
 
-    let shotCoords = (await question("Onde deseja atirar (ex.: A5) ? "))
+    let shotCoords = (await question("Where do you wanna shoot (ex.: A5) ? "))
       .replace(/\s/g, "")
       .toUpperCase();
 
@@ -120,42 +116,70 @@ class ClientMatch {
       !BoardVisualizer.LINES_LETTERS.find(letter => letter === shotCoords[0]) ||
       !BoardVisualizer.COLUMNS_NUMBERS.find(number => number === shotCoords[1])
     )
-      shotCoords = (await question("Onde deseja atirar (ex.: A5) ? "))
+      shotCoords = (await question("Where do you wanna shoot (ex.: A5) ? "))
         .replace(/\s/g, "")
         .toUpperCase();
 
     const response = await this.shot(
       shotCoords,
-      this.match.player1.id,
-      this.match.player2Board.id
+      this.player.id,
+      this.enemyBoard.id
     );
 
     if (response.gameOver) {
       this.match.status = Match.Status.FINISHED;
-      console.log("Parabéns! Você ganhou a partida!");
+      console.log("Congratulations! You won the match!");
     } else if (response.hit) {
-      console.log("Parabéns! Você acertou uma unidade inimiga!");
+      console.log("Congratulations! You hit an enemy unit!");
       await delay(ClientMatch.DELAY_BETWEEN_SHOTS);
-      await this.player1Turn();
+      await this.letPlayerShoot();
     }
   }
 
-  async player2Turn() {
+  async waitEnemyShots() {
     this.printBoards();
 
-    while (this.serverShotMessages.length === 0) await delay(500);
+    let enemyShotResponse;
 
     do {
-      const serverShotResponse = this.serverShotMessages.shift().data;
+      console.log("Waiting enemy shots...");
+      while (this.enemyShotMessages.length === 0) await delay(500);
 
-      await this.animateShot(serverShotResponse.shot, this.match.player1Board);
+      enemyShotResponse = this.enemyShotMessages.shift().data;
 
-      if (serverShotResponse.gameOver) {
-        this.serverShotMessages = [];
-        this.match.status = Match.Status.FINISHED;
-        console.log("Que pena, você perdeu a partida!");
-      }
-    } while (this.serverShotMessages.length !== 0);
+      await this.animateShot(enemyShotResponse.shot, this.playerBoard);
+    } while (!enemyShotResponse.gameOver && enemyShotResponse.hit);
+
+    if (enemyShotResponse.gameOver) {
+      this.match.status = Match.Status.FINISHED;
+      console.log("What a pity, you lost the match!");
+    }
+  }
+
+  async start() {
+    if (this.isPlayer1)
+      await this.messages.sendMessage(null, Message.MsgType.START_MATCH, {
+        matchId: this.match.id,
+      });
+
+    this.match.status = Match.Status.STARTED;
+
+    if (this.isPlayer1) await this.letPlayerShoot();
+    else await this.waitEnemyShots();
+
+    // @ts-ignore
+    while (this.match.status !== Match.Status.FINISHED) {
+      if (this.isPlayer1) await this.waitEnemyShots();
+      else await this.letPlayerShoot();
+
+      // @ts-ignore
+      if (this.match.status === Match.Status.FINISHED) break;
+
+      if (this.isPlayer1) await this.letPlayerShoot();
+      else await this.waitEnemyShots();
+    }
+
+    this.messages.removeObserver(this.enemyShotObserverId);
   }
 }
 

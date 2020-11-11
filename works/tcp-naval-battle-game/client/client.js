@@ -1,11 +1,9 @@
-const { getInitialBoard } = require("./input");
+const { createMatchMenu } = require("./input");
 const { question, readlineInterface } = require("./io");
 const { client, serverHost, serverPort } = require("./clientSocket");
 const Messages = require("./Messages");
 const Observers = require("./Observers");
-const ClientMatch = require("./ClientMatch");
 
-const { Message, Match } = require("../shared");
 const { delay } = require("../utils");
 
 const observers = new Observers();
@@ -28,55 +26,27 @@ client.on("close", () => {
 });
 
 (async () => {
-  console.log("---- Seja bem vindo(a) ao jogo Batalha Naval ----");
+  console.log("---- 🎯 Be welcome to the Naval Battle Game 🎯 ----");
   console.log();
   let operation;
 
   while (operation !== "S") {
-    operation = await question(`Digite:
-S para Sair
-C para começar uma nova partida
+    operation = await question(`Type:
+Q to Quit
+N to start a new match
 
 : `);
     console.log();
     operation = operation.toUpperCase();
 
     switch (operation) {
-      case "C":
-        const response = await messages.sendMessage(
-          null,
-          Message.MsgType.CREATE_MATCH,
-          null
-        );
-
-        let player1Board = await getInitialBoard();
-        const player2Board = response.data.player2Board;
-
-        player1Board = (
-          await messages.sendMessage(null, Message.MsgType.SET_BOARD, {
-            board: player1Board,
-            matchId: response.data.id,
-            playerId: response.data.player1.id,
-          })
-        ).data;
-
-        const match = new Match(
-          response.data.id,
-          response.data.player1,
-          response.data.player2,
-          player1Board,
-          player2Board,
-          response.data.status
-        );
-
-        await new ClientMatch(messages, match).start();
-
+      case "N":
+        createMatchMenu(messages);
         break;
     }
 
-    console.log();
     await delay(500);
-    console.log();
+    console.clear();
   }
 
   client.destroy();
