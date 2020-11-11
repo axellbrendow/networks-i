@@ -15,6 +15,22 @@ module.exports = (message, messages, socketName) => {
       message.data.playerId
     );
 
+    repositories.match.setBoard(
+      board,
+      message.data.matchId,
+      message.data.playerId
+    );
+
+    const match = repositories.match.get(message.data.matchId);
+
+    if (!match.player2IsABot && match.player2Board)
+      messages.sendMessage(
+        null,
+        match.player1SocketName,
+        Message.MsgType.PLAYER2_DEFINED_BOARD,
+        match
+      );
+
     messages.sendMessage(message.id, socketName, message.type, board);
   }
 };
