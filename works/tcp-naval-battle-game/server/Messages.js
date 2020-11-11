@@ -65,7 +65,7 @@ class Messages {
           if (numTries > 0)
             this.sendMessage(id, socketName, messageType, data, numTries - 1);
           else {
-            console.error("Nao foi possivel enviar os dados (3 tentativas)");
+            console.error("Could not send the data (3 tries)");
           }
         }
       });

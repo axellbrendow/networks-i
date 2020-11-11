@@ -35,7 +35,7 @@ const { createNewId } = require("../utils");
       observer: import("./Observers").Observer<
         import('../shared/responses').Responses[messageType]
       >,
-    ) => void
+    ) => string
   )
 }} AddObserverTypes
 */
@@ -83,7 +83,7 @@ class Messages {
                 .then(resolve)
                 .catch(reject);
             else {
-              console.error("Nao foi possivel enviar os dados (3 tentativas)");
+              console.error("Could not send the data (3 tries)");
               reject(error);
             }
           } else {
@@ -99,11 +99,10 @@ class Messages {
     };
 
     /** @type {AddObserverFunc} */
-    this.addObserverFor = (messageType, observer) => {
+    this.addObserverFor = (messageType, observer) =>
       this.observers.addObserver((message, messages) => {
         if (message.type === messageType) observer(message, messages);
       });
-    };
 
     this.createNewMessage = this.createNewMessage.bind(this);
   }
@@ -119,6 +118,13 @@ class Messages {
     const message = { id: id || createNewId(), type: messageType, data };
     this.messages[message.id] = message;
     return message;
+  }
+
+  /**
+   * @param {string} observerId
+   */
+  removeObserver(observerId) {
+    this.observers.removeObserver(observerId);
   }
 }
 
