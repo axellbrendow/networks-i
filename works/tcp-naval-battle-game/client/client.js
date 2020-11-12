@@ -26,12 +26,12 @@ client.on("close", () => {
 });
 
 (async () => {
-  console.log("---- 🎯 Be welcome to the Naval Battle Game 🎯 ----");
-  console.log();
   let operation;
 
-  while (operation !== "S") {
-    operation = await question(`Type:
+  while (operation !== "Q") {
+    operation = await question(`---- 🎯 Be welcome to the Naval Battle Game 🎯 ----
+
+Type:
 Q to Quit
 N to start a new match
 
@@ -41,12 +41,9 @@ N to start a new match
 
     switch (operation) {
       case "N":
-        createMatchMenu(messages);
+        await createMatchMenu(messages);
         break;
     }
-
-    await delay(500);
-    console.clear();
   }
 
   client.destroy();

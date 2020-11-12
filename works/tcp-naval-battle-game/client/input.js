@@ -160,11 +160,12 @@ const createMultiplayerMatch = async messages => {
  */
 const createMatchMenu = async messages => {
   console.clear();
-
   let operation;
 
-  while (operation !== "S") {
-    operation = await question(`Type:
+  while (operation !== "Q") {
+    operation = await question(`---- 🎯 Be welcome to the Naval Battle Game 🎯 ----
+
+Type:
 Q to Quit
 B to start a new match against a bot
 M to start a multiplayer match
