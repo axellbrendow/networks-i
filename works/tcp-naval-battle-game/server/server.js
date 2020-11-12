@@ -8,4 +8,6 @@ const messages = new Messages(server, observers);
 
 server.setMessages(messages);
 
-server.server.listen(server.serverPort, "localhost");
+server.server.listen(server.serverPort, "localhost", () => {
+  console.log(`Server running on 127.0.0.1:${server.serverPort}`);
+});
